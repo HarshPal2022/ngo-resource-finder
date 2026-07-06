@@ -5,17 +5,18 @@ url = "https://ngosindia.com/"
 
 headers = {
     "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "Mozilla/5.0 (Windows NT 10.0; Win64; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/137.0.0.0 Safari/537.36"
     )
 }
 
-response = requests.get(url, headers=headers, timeout=15)
+response = requests.get(url, headers=headers)
 
-print("Status Code:", response.status_code)
+print("Status:", response.status_code)
 
 if response.status_code == 200:
-    print("Website is reachable!")
-else:
-    print("Couldn't access the website.")
+    with open("page.html", "w", encoding="utf-8") as f:
+        f.write(response.text)
+
+    print("HTML saved successfully!")
