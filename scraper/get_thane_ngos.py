@@ -1,5 +1,7 @@
 import requests
+import pandas as pd
 from bs4 import BeautifulSoup
+import os
 
 URL = "https://ngosindia.org/maharashtra/thane-ngos/"
 
@@ -21,9 +23,17 @@ for a in soup.find_all("a", href=True):
     if "/maharashtra-ngos/" in href:
         links.append(href)
 
-links = list(set(links))
+# Remove duplicates
+links = sorted(list(set(links)))
 
 print(f"Found {len(links)} NGO profile links")
 
-for link in links[:10]:
-    print(link)
+# Create data folder if it doesn't exist
+os.makedirs("data", exist_ok=True)
+
+# Save to CSV
+df = pd.DataFrame({"profile_url": links})
+
+df.to_csv("data/thane_links.csv", index=False)
+
+print("Saved to data/thane_links.csv")
