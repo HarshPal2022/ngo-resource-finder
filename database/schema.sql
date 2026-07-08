@@ -1,15 +1,19 @@
-CREATE DATABASE IF NOT EXISTS ngo_finder;
+DROP DATABASE IF EXISTS ngo_connect;
 
-USE ngo_finder;
+CREATE DATABASE ngo_connect;
 
-CREATE TABLE IF NOT EXISTS ngos (
+USE ngo_connect;
+
+CREATE TABLE ngos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    category VARCHAR(100),
-    city VARCHAR(100),
-    state VARCHAR(100),
-    description TEXT,
-    contact VARCHAR(100),
+    address TEXT,
+    phone VARCHAR(255),
+    mobile VARCHAR(255),
     email VARCHAR(255),
-    website VARCHAR(255)
+    website VARCHAR(255),
+    contact_person VARCHAR(255),
+    purpose TEXT,
+    mission TEXT,
+    url VARCHAR(500) UNIQUE
 );
