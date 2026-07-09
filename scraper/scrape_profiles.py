@@ -1,64 +1,100 @@
+import os
 import time
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from config import HEADERS, INPUT_LINKS, OUTPUT_DATA, REQUEST_DELAY
+from config import (
+    HEADERS,
+    LINKS_FILE,
+    RAW_DATA_FILE,
+    REQUEST_DELAY,
+)
 from utils.parser import parse_entry
+MAX_RETRIES = 3
 
+session = requests.Session()
+session.headers.update(HEADERS)
 
 def scrape_profile(url):
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = session.get(
+                url,
+                timeout=30
+            )
 
-    response = requests.get(url, headers=HEADERS, timeout=20)
-    response.raise_for_status()
+            response.raise_for_status()
+            soup = BeautifulSoup(
+                response.text,
+                "html.parser"
+            )
 
-    soup = BeautifulSoup(response.text, "html.parser")
+            title = soup.find(
+                "h1",
+                class_="entry-title"
+            )
 
-    title = soup.find("h1", class_="entry-title")
+            name = title.get_text(strip=True) if title else ""
+            entry = soup.find(
+                "div",
+                class_="entry clearfix"
+            )
 
-    if title:
-        name = title.get_text(strip=True)
-    else:
-        name = ""
+            if entry is None:
+                raise Exception("NGO content not found.")
 
-    entry = soup.find("div", class_="entry clearfix")
+            lines = [
+                line.strip()
+                for line in entry.get_text(
+                    "\n",
+                    strip=True
+                ).split("\n")
+                if line.strip()
+            ]
 
-    if entry is None:
-        raise Exception("Could not find NGO content.")
+            data = parse_entry(lines)
+            data["name"] = name
+            data["url"] = url
 
-    lines = [
-        line.strip()
-        for line in entry.get_text("\n", strip=True).split("\n")
-        if line.strip()
-    ]
+            return data
+        except Exception:
 
-    data = parse_entry(lines)
+            if attempt == MAX_RETRIES - 1:
+                raise
+            time.sleep(2)
 
-    data["name"] = name
-    data["url"] = url
-
-    return data
-
+    return None
 
 def main():
 
-    links = pd.read_csv(INPUT_LINKS)
+    print("=" * 60)
+    print("NGOConnect AI - Profile Scraper")
+    print("=" * 60)
+
+    if not os.path.exists(LINKS_FILE):
+        raise FileNotFoundError(LINKS_FILE)
+
+    links = pd.read_csv(LINKS_FILE)
 
     ngos = []
-
     total = len(links)
-
-    print(f"\nFound {total} NGO profiles.\n")
-
+    failed = 0
+    print(f"\nTotal NGO Profiles : {total}\n")
     for index, row in links.iterrows():
 
+        district = row["district"]
         url = row["profile_url"]
 
-        print(f"[{index+1}/{total}] Scraping...")
+        print(
+            f"[{index + 1}/{total}] {district}"
+        )
 
         try:
 
             ngo = scrape_profile(url)
+
+            ngo["district"] = district
 
             ngos.append(ngo)
 
@@ -66,7 +102,12 @@ def main():
 
         except Exception as e:
 
-            print(f"✗ Failed: {url}")
+            failed += 1
+
+            print(f"✗ Failed")
+
+            print(url)
+
             print(e)
 
         time.sleep(REQUEST_DELAY)
@@ -74,6 +115,7 @@ def main():
     df = pd.DataFrame(ngos)
 
     columns = [
+        "district",
         "name",
         "address",
         "phone",
@@ -88,13 +130,19 @@ def main():
 
     df = df.reindex(columns=columns)
 
-    df.to_csv(OUTPUT_DATA, index=False)
+    os.makedirs("data", exist_ok=True)
 
-    print("\n---------------------------------------")
-    print(f"Saved {len(df)} NGOs")
-    print(f"Output -> {OUTPUT_DATA}")
-    print("---------------------------------------")
+    df.to_csv(
+        RAW_DATA_FILE,
+        index=False
+    )
 
+    print("\n" + "=" * 60)
+    print("Scraping Completed")
+    print("=" * 60)
+    print(f"Successful : {len(df)}")
+    print(f"Failed     : {failed}")
+    print(f"Saved      : {RAW_DATA_FILE}")
 
 if __name__ == "__main__":
     main()

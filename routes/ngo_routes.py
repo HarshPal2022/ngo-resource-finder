@@ -1,3 +1,5 @@
+import traceback
+
 from flask import Blueprint, jsonify, request
 
 from database.db import (
@@ -15,14 +17,17 @@ ngo_bp = Blueprint("ngo", __name__)
 @ngo_bp.route("/api/ngos", methods=["GET"])
 def all_ngos():
 
-    ngos = get_all_ngos()
-
+    page = request.args.get("page", default=1, type=int)
+    data = get_all_ngos(page=page)
     return jsonify({
         "success": True,
-        "count": len(ngos),
-        "results": ngos
+        "page": data["page"],
+        "per_page": data["per_page"],
+        "total": data["total"],
+        "total_pages": data["total_pages"],
+        "count": len(data["results"]),
+        "results": data["results"]
     })
-
 
 @ngo_bp.route("/api/ngos/<int:ngo_id>", methods=["GET"])
 def ngo_details(ngo_id):
@@ -53,23 +58,28 @@ def districts():
         "districts": districts
     })
 
-
 @ngo_bp.route("/api/search", methods=["GET"])
 def search():
-
     keyword = request.args.get("q", "").strip()
     district = request.args.get("district", "").strip()
-
-    ngos = search_ngos(keyword, district)
+    page = request.args.get("page", default=1, type=int)
+    data = search_ngos(
+        keyword=keyword,
+        district=district,
+        page=page
+    )
 
     return jsonify({
         "success": True,
         "query": keyword,
         "district": district,
-        "count": len(ngos),
-        "results": ngos
+        "page": data["page"],
+        "per_page": data["per_page"],
+        "total": data["total"],
+        "total_pages": data["total_pages"],
+        "count": len(data["results"]),
+        "results": data["results"]
     })
-
 
 @ngo_bp.route("/api/recommend", methods=["POST"])
 def recommendation():
@@ -106,8 +116,8 @@ def recommendation():
         })
 
     except Exception as e:
-
+        traceback.print_exc()
         return jsonify({
-            "success": False,
-            "message": str(e)
-        }), 500
+            "success":False,
+            "message":str(e)
+        }),500

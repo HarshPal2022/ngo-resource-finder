@@ -1,9 +1,8 @@
 """
-Application configuration
+Application Configuration
 """
 
 STATE = "maharashtra"
-DISTRICT = "thane"
 
 BASE_URL = "https://ngosindia.org"
 
@@ -17,6 +16,14 @@ HEADERS = {
 
 REQUEST_DELAY = 2
 
-INPUT_LINKS = f"data/{DISTRICT}_links.csv"
+# ===========================
+# Data Files
+# ===========================
 
-OUTPUT_DATA = f"data/{DISTRICT}_ngos.csv"
+DISTRICTS_FILE = "data/districts.csv"
+
+LINKS_FILE = "data/links.csv"
+
+RAW_DATA_FILE = "data/ngos.csv"
+
+CLEAN_DATA_FILE = "data/cleaned_ngos.csv"

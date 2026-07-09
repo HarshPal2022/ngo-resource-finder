@@ -20,8 +20,8 @@
                 <p>TF-IDF Recommendation</p>
             </div>
             <div class="bg-white/10 rounded-xl p-6">
-                <h2>Maharashtra</h2>
-                <p>District-wise Search</p>
+                <h2>36 Districts</h2>
+                <p>Maharashtra NGOs</p>
             </div>
         </div>
     </div>
@@ -30,24 +30,46 @@
 <section class="max-w-7xl mx-auto px-6 py-14">
     <div class="grid lg:grid-cols-2 gap-8">
         <div class="bg-white rounded-xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold mb-6">Search NGOs</h2>
-            <select id="districtSearch" class="w-full border rounded-lg p-3 mb-4">
-                <option value="">All Districts</option>
-            </select>
-            <input id="searchInput" type="text" placeholder="Education, Women, Health..."
+            <h2 class="text-2xl font-bold mb-6">
+                Search NGOs
+            </h2>
+            <select
+                id="districtSearch"
                 class="w-full border rounded-lg p-3 mb-4">
-            <button id="searchBtn" class="w-full bg-blue-600 text-white rounded-lg py-3">
+                <option value="">
+                    All Districts
+                </option>
+            </select>
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Education, Women, Health..."
+                class="w-full border rounded-lg p-3 mb-4">
+            <button
+                id="searchBtn"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3">
                 Search NGOs
             </button>
         </div>
         <div class="bg-white rounded-xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold mb-6">AI Recommendation</h2>
-            <select id="districtRecommend" class="w-full border rounded-lg p-3 mb-4">
-                <option value="">All Districts</option>
+            <h2 class="text-2xl font-bold mb-6">
+                AI Recommendation
+            </h2>
+            <select
+                id="districtRecommend"
+                class="w-full border rounded-lg p-3 mb-4">
+                <option value="">
+                    All Districts
+                </option>
             </select>
-            <textarea id="recommendInput" rows="5" placeholder="Example: I need education support for girls."
+            <textarea
+                id="recommendInput"
+                rows="5"
+                placeholder="Example: I need education support for girls."
                 class="w-full border rounded-lg p-3 mb-4"></textarea>
-            <button id="recommendBtn" class="w-full bg-green-600 text-white rounded-lg py-3">
+            <button
+                id="recommendBtn"
+                class="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-3">
                 Find NGOs
             </button>
         </div>
@@ -55,55 +77,106 @@
 
 </section>
 
-<section class="max-w-7xl mx-auto px-6">
-    <div id="loading" class="hidden text-center py-8">
+<section class="max-w-7xl mx-auto px-6 pb-20">
+    <div
+        id="loading"
+        class="hidden text-center py-8">
         <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto"></div>
-        <p class="mt-4">Searching...</p>
+        <p class="mt-4">
+            Searching...
+        </p>
     </div>
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold">Results</h2>
-        <span id="resultCount" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
+        <h2 class="text-3xl font-bold">
+            Results
+        </h2>
+        <span
+            id="resultCount"
+            class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
             0 NGOs
         </span>
     </div>
-    <div id="emptyState" class="hidden bg-white rounded-xl shadow p-10 text-center">
-        <h3 class="text-2xl font-bold">No NGOs Found</h3>
+    <div
+        id="emptyState"
+        class="hidden bg-white rounded-xl shadow p-10 text-center">
+        <h3 class="text-2xl font-bold">
+            No NGOs Found
+        </h3>
         <p class="text-slate-500 mt-2">
-            Try another district or keyword.
+            Try another district or another keyword.
         </p>
     </div>
-    <div id="resultsContainer" class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div
+        id="resultsContainer"
+        class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+    </div>
+    <!-- Pagination -->
+    <div
+        id="pagination"
+        class="hidden mt-12 flex justify-center items-center gap-2 flex-wrap">
+        <button
+            id="prevPage"
+            class="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">
+            Previous
+        </button>
+        <div
+            id="pageNumbers"
+            class="flex gap-2 flex-wrap">
+        </div>
+        <button
+            id="nextPage"
+            class="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">
+            Next
+        </button>
     </div>
 
 </section>
 
 <template id="ngoCardTemplate">
     <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col">
-        <div class="flex justify-between">
+        <div class="flex justify-between items-start gap-3">
             <h3 class="ngo-name text-xl font-bold"></h3>
-            <span class="score hidden bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm"></span>
+            <span
+                class="score hidden bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm whitespace-nowrap">
+            </span>
         </div>
         <p class="text-blue-700 text-sm mt-2">
-            District:
+            District :
             <span class="ngo-district font-semibold"></span>
         </p>
         <p class="ngo-address text-sm text-slate-500 mt-2"></p>
         <p class="ngo-purpose mt-4"></p>
         <div class="mt-5 space-y-2 text-sm">
-            <p><strong>Contact:</strong> <span class="ngo-contact"></span></p>
-            <p><strong>Phone:</strong> <span class="ngo-phone"></span></p>
-            <p><strong>Email:</strong> <span class="ngo-email"></span></p>
             <p>
-                <strong>Website:</strong>
-                <a class="ngo-website text-blue-600 break-all" target="_blank"></a>
+                <strong>Contact :</strong>
+                <span class="ngo-contact"></span>
+            </p>
+            <p>
+                <strong>Phone :</strong>
+                <span class="ngo-phone"></span>
+            </p>
+            <p>
+                <strong>Email :</strong>
+                <span class="ngo-email"></span>
+            </p>
+            <p>
+                <strong>Website :</strong>
+                <a
+                    class="ngo-website text-blue-600 break-all"
+                    target="_blank">
+
+                </a>
             </p>
         </div>
         <div class="mt-auto pt-6">
-            <a class="ngo-url block bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg py-3"
+            <a
+                class="ngo-url block bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg py-3"
                 target="_blank">
-                Visit NGO
+
+                Visit NGO →
             </a>
         </div>
     </div>
 </template>
+
 {% endblock %}

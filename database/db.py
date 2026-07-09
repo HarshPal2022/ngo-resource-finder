@@ -90,24 +90,36 @@ def insert_data():
     print("=" * 60)
     print(f"Imported {inserted} NGO records successfully.")
 
-
-def get_all_ngos():
+def get_all_ngos(page=1, per_page=20):
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT COUNT(*) AS total FROM ngos")
+    total = cursor.fetchone()["total"]
 
-    cursor.execute("""
+    offset = (page - 1) * per_page
+
+    cursor.execute(
+        """
         SELECT *
         FROM ngos
         ORDER BY name
-    """)
+        LIMIT %s OFFSET %s
+        """,
+        (per_page, offset),
+    )
 
     ngos = cursor.fetchall()
-
     cursor.close()
     connection.close()
 
-    return ngos
+    return {
+        "results": ngos,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "total_pages": (total + per_page - 1) // per_page,
+    }
 
 
 def get_ngo_by_id(ngo_id):
@@ -144,45 +156,68 @@ def get_districts():
     return districts
 
 
-def search_ngos(keyword="", district=""):
-
+def search_ngos(keyword="", district="", page=1, per_page=20):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 
-    keyword = f"%{keyword}%"
-    query = """
-    SELECT *
-    FROM ngos
-    WHERE
-    (
-        name LIKE %s
-        OR address LIKE %s
-        OR purpose LIKE %s
-        OR mission LIKE %s
-        OR contact_person LIKE %s
-    )
-    """
+    conditions = []
+    params = []
 
-    params = [
-        keyword,
-        keyword,
-        keyword,
-        keyword,
-        keyword,
-    ]
+    if keyword:
+        like = f"%{keyword}%"
+        conditions.append("""
+        (
+            name LIKE %s
+            OR address LIKE %s
+            OR purpose LIKE %s
+            OR mission LIKE %s
+            OR contact_person LIKE %s
+        )
+        """)
+        params.extend([like, like, like, like, like])
 
     if district:
-        query += " AND district=%s"
+        conditions.append("district=%s")
         params.append(district)
 
-    query += " ORDER BY name"
+    where_clause = ""
 
+    if conditions:
+        where_clause = "WHERE " + " AND ".join(conditions)
+
+    cursor.execute(
+        f"""
+        SELECT COUNT(*) AS total
+        FROM ngos
+        {where_clause}
+        """,
+        tuple(params),
+    )
+
+    total = cursor.fetchone()["total"]
+    offset = (page - 1) * per_page
+
+    query = f"""
+    SELECT *
+    FROM ngos
+    {where_clause}
+    ORDER BY name
+    LIMIT %s OFFSET %s
+    """
+
+    params.extend([per_page, offset])
     cursor.execute(query, tuple(params))
     ngos = cursor.fetchall()
     cursor.close()
     connection.close()
-    return ngos
 
+    return {
+        "results": ngos,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "total_pages": (total + per_page - 1) // per_page,
+    }
 
 def count_ngos():
 
