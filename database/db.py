@@ -8,12 +8,7 @@ from database import db_config
 
 CSV_FILE = "data/cleaned_ngos.csv"
 
-
 def get_connection():
-    """
-    Create and return a MySQL connection.
-    """
-
     try:
         connection = mysql.connector.connect(
             host=db_config.MYSQL_HOST,
@@ -22,7 +17,6 @@ def get_connection():
             password=db_config.MYSQL_PASSWORD,
             database=db_config.MYSQL_DATABASE,
         )
-
         return connection
 
     except mysql.connector.Error as err:
@@ -32,9 +26,6 @@ def get_connection():
 
 
 def insert_data():
-    """
-    Import cleaned NGO CSV into MySQL.
-    """
 
     if not os.path.exists(CSV_FILE):
         print(f"\nCSV file not found:\n{CSV_FILE}")
@@ -51,6 +42,7 @@ def insert_data():
     INSERT INTO ngos
     (
         name,
+        district,
         address,
         phone,
         mobile,
@@ -63,7 +55,7 @@ def insert_data():
     )
     VALUES
     (
-        %s,%s,%s,%s,%s,%s,%s,%s,%s,%s
+        %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s
     )
     """
 
@@ -73,6 +65,7 @@ def insert_data():
 
         values = (
             None if pd.isna(row["name"]) else str(row["name"]),
+            None if pd.isna(row["district"]) else str(row["district"]),
             None if pd.isna(row["address"]) else str(row["address"]),
             None if pd.isna(row["phone"]) else str(row["phone"]),
             None if pd.isna(row["mobile"]) else str(row["mobile"]),
@@ -99,20 +92,15 @@ def insert_data():
 
 
 def get_all_ngos():
-    """
-    Return all NGOs.
-    """
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT *
         FROM ngos
         ORDER BY name
-        """
-    )
+    """)
 
     ngos = cursor.fetchall()
 
@@ -123,93 +111,122 @@ def get_all_ngos():
 
 
 def get_ngo_by_id(ngo_id):
-    """
-    Return NGO by ID.
-    """
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT *
         FROM ngos
-        WHERE id = %s
-        """,
-        (ngo_id,),
-    )
+        WHERE id=%s
+    """, (ngo_id,))
 
     ngo = cursor.fetchone()
-
     cursor.close()
     connection.close()
 
     return ngo
 
 
-def search_ngos(keyword):
-    """
-    Search NGOs using keyword.
-    """
+def get_districts():
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT DISTINCT district
+        FROM ngos
+        ORDER BY district
+    """)
+    districts = [row[0] for row in cursor.fetchall()]
+
+    cursor.close()
+    connection.close()
+    return districts
+
+
+def search_ngos(keyword="", district=""):
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 
     keyword = f"%{keyword}%"
-
-    cursor.execute(
-        """
-        SELECT *
-        FROM ngos
-        WHERE
-            name LIKE %s
-            OR address LIKE %s
-            OR purpose LIKE %s
-            OR mission LIKE %s
-            OR contact_person LIKE %s
-        ORDER BY name
-        """,
-        (
-            keyword,
-            keyword,
-            keyword,
-            keyword,
-            keyword,
-        ),
+    query = """
+    SELECT *
+    FROM ngos
+    WHERE
+    (
+        name LIKE %s
+        OR address LIKE %s
+        OR purpose LIKE %s
+        OR mission LIKE %s
+        OR contact_person LIKE %s
     )
+    """
 
+    params = [
+        keyword,
+        keyword,
+        keyword,
+        keyword,
+        keyword,
+    ]
+
+    if district:
+        query += " AND district=%s"
+        params.append(district)
+
+    query += " ORDER BY name"
+
+    cursor.execute(query, tuple(params))
     ngos = cursor.fetchall()
-
     cursor.close()
     connection.close()
-
     return ngos
 
 
 def count_ngos():
-    """
-    Return total NGO count.
-    """
 
     connection = get_connection()
     cursor = connection.cursor()
-
     cursor.execute("SELECT COUNT(*) FROM ngos")
-
     count = cursor.fetchone()[0]
+    cursor.close()
+    connection.close()
+    return count
+
+
+def recommend_ngos(ids):
+    if not ids:
+        return []
+
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    placeholders = ",".join(["%s"] * len(ids))
+
+    cursor.execute(
+        f"""
+        SELECT *
+        FROM ngos
+        WHERE id IN ({placeholders})
+        """,
+        tuple(ids),
+    )
+    ngos = cursor.fetchall()
+    ngo_map = {ngo["id"]: ngo for ngo in ngos}
+    ordered = []
+
+    for ngo_id in ids:
+        if ngo_id in ngo_map:
+            ordered.append(ngo_map[ngo_id])
 
     cursor.close()
     connection.close()
-
-    return count
-
+    return ordered
 
 if __name__ == "__main__":
 
     print("=" * 60)
     print("NGOConnect AI - Database Loader")
     print("=" * 60)
-
     insert_data()
-
     print(f"Database now contains {count_ngos()} NGOs.")

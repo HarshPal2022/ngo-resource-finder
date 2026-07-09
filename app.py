@@ -1,23 +1,22 @@
-from flask import Flask, jsonify
-from config import Config
+from flask import Flask, render_template, jsonify
+
+from routes.ngo_routes import ngo_bp
 
 app = Flask(__name__)
-app.config.from_object(Config)
+
+app.register_blueprint(ngo_bp)
 
 
 @app.route("/")
 def home():
-    return jsonify({
-        "project": "NGOConnect AI",
-        "status": "Running",
-        "version": "1.0.0"
-    })
+    return render_template("index.html")
 
 
 @app.route("/health")
 def health():
     return jsonify({
-        "status": "healthy"
+        "status": "healthy",
+        "project": "NGOConnect AI"
     })
 
 
