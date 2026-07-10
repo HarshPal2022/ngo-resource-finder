@@ -1,29 +1,61 @@
 import re
 
-
+# Field names that may appear on the NGO pages
 FIELDS = [
-    "Add.",
+    "Add",
     "Phone",
+    "Tel",
     "Mobile",
     "Email",
     "Website",
     "Contact Person",
     "Purpose",
+    "Aim/Objective/Mission",
     "Aims/Objectives/Mission",
 ]
 
 
 def clean_text(text: str) -> str:
+    """
+    Clean extracted text.
+    """
+
     if text is None:
         return ""
 
     text = (
         text.replace("\xa0", " ")
-            .replace("😕", "")
-            .replace("?", "")
+        .replace("😕", "")
+        .replace("?", "")
+        .replace("•", " ")
     )
 
     return " ".join(text.split()).strip()
+
+
+def normalize_field_name(text):
+    """
+    Normalize labels like:
+        Add :
+        Add.:
+        Add.
+        Add
+    into
+        Add
+
+    Also handles:
+        Aim/Objective/Mission
+        Aims/Objectives/Mission
+    """
+
+    text = clean_text(text)
+
+    if ":" in text:
+        text = text.split(":", 1)[0]
+
+    text = text.replace(".", "").strip()
+
+    return text
 
 
 def extract_field(lines, field_name):
@@ -41,11 +73,14 @@ def extract_field(lines, field_name):
         if not line:
             continue
 
-        if line.startswith(field_name):
+        normalized = normalize_field_name(line)
+
+        if normalized == normalize_field_name(field_name):
 
             capture = True
 
             if ":" in line:
+
                 value = line.split(":", 1)[1].strip()
 
                 if value:
@@ -55,7 +90,18 @@ def extract_field(lines, field_name):
 
         if capture:
 
-            if any(line.startswith(field) for field in FIELDS):
+            is_new_field = False
+
+            for field in FIELDS:
+
+                if normalize_field_name(line) == normalize_field_name(field):
+                    is_new_field = True
+                    break
+
+            if is_new_field:
+                break
+
+            if line.lower() in ("tweet", "related"):
                 break
 
             collected.append(line)
@@ -65,7 +111,7 @@ def extract_field(lines, field_name):
 
 def extract_phone_numbers(text):
     """
-    Extract phone/mobile numbers while preserving each one separately.
+    Extract all phone numbers.
     """
 
     if not text:
@@ -73,8 +119,10 @@ def extract_phone_numbers(text):
 
     text = text.replace("\n", " ")
 
-    # Find numbers with optional +, spaces, hyphens
-    matches = re.findall(r"\+?\d[\d\s\-()]{6,}\d", text)
+    matches = re.findall(
+        r"\+?\d[\d\s\-()]{6,}\d",
+        text,
+    )
 
     numbers = []
 
@@ -82,15 +130,18 @@ def extract_phone_numbers(text):
 
         number = re.sub(r"[^\d+]", "", match)
 
-        numbers.append(number)
+        if number:
+            numbers.append(number)
 
-    # Remove duplicates
     numbers = list(dict.fromkeys(numbers))
 
     return ", ".join(numbers)
 
 
 def extract_emails(text):
+    """
+    Extract email addresses.
+    """
 
     if not text:
         return ""
@@ -106,6 +157,9 @@ def extract_emails(text):
 
 
 def extract_websites(text):
+    """
+    Extract website URLs.
+    """
 
     if not text:
         return ""
@@ -115,20 +169,39 @@ def extract_websites(text):
         text,
     )
 
-    websites = [site.rstrip(".,)") for site in websites]
+    cleaned = []
 
-    websites = list(dict.fromkeys(websites))
+    for site in websites:
 
-    return ", ".join(websites)
+        site = site.rstrip(".,)")
+
+        if not site.startswith("http"):
+            site = "https://" + site
+
+        cleaned.append(site)
+
+    cleaned = list(dict.fromkeys(cleaned))
+
+    return ", ".join(cleaned)
 
 
 def parse_entry(lines):
+    """
+    Parse NGO information from extracted lines.
+    """
 
-    address = clean_text(extract_field(lines, "Add."))
+    address = clean_text(
+        extract_field(lines, "Add")
+    )
 
     phone = extract_phone_numbers(
         extract_field(lines, "Phone")
     )
+
+    if not phone:
+        phone = extract_phone_numbers(
+            extract_field(lines, "Tel")
+        )
 
     mobile = extract_phone_numbers(
         extract_field(lines, "Mobile")
@@ -153,6 +226,11 @@ def parse_entry(lines):
     mission = clean_text(
         extract_field(lines, "Aims/Objectives/Mission")
     )
+
+    if not mission:
+        mission = clean_text(
+            extract_field(lines, "Aim/Objective/Mission")
+        )
 
     return {
         "address": address,

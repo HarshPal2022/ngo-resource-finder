@@ -4,175 +4,163 @@
 
 {% block content %}
 
-<section class="bg-gradient-to-r from-blue-700 to-cyan-600 text-white">
-    <div class="max-w-7xl mx-auto px-6 py-20 text-center">
-        <h1 class="text-5xl font-extrabold mb-5">Find the Right NGO with AI</h1>
-        <p class="text-xl max-w-3xl mx-auto opacity-95">
-            Search NGOs across Maharashtra or let AI recommend the best NGO for your needs.
+<!-- ================= HERO ================= -->
+<section class="max-w-7xl mx-auto px-6 pt-16 pb-20">
+    <div class="glass-strong rounded-[32px] px-8 py-14 md:px-16 md:py-16 text-center max-w-5xl mx-auto">
+        <span class="hero-eyebrow">
+            <span class="dot"></span>
+            Live across 36 districts
+        </span>
+        <h1 class="hero-title font-display mt-6">
+            Find the right NGO,<br class="hidden md:block">
+            <span class="accent">without the guesswork.</span>
+        </h1>
+        <p class="hero-sub mt-6 max-w-2xl mx-auto">
+            Search NGOs across Maharashtra by cause and district, or describe what you need
+            and let AI match you to the organisations best placed to help.
         </p>
-        <div class="grid md:grid-cols-3 gap-6 mt-14">
-            <div class="bg-white/10 rounded-xl p-6">
-                <h2 id="ngoCount" class="text-4xl font-bold">--</h2>
-                <p>Total NGOs</p>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-5 mt-10 max-w-5xl mx-auto">
+        <div class="stat-chip glass">
+            <div class="stat-icon" style="background:rgba(61,90,254,.12)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3d5afe" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
-            <div class="bg-white/10 rounded-xl p-6">
-                <h2>AI Powered</h2>
-                <p>TF-IDF Recommendation</p>
+            <h2 id="ngoCount" class="stat-num">0</h2>
+            <p class="stat-label">Registered NGOs</p>
+        </div>
+        <div class="stat-chip glass">
+            <div class="stat-icon" style="background:rgba(255,107,74,.12)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff6b4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 2v10l7-4.33"></path></svg>
             </div>
-            <div class="bg-white/10 rounded-xl p-6">
-                <h2>36 Districts</h2>
-                <p>Maharashtra NGOs</p>
+            <h2 class="stat-num">TF-IDF</h2>
+            <p class="stat-label">AI-powered matching</p>
+        </div>
+        <div class="stat-chip glass">
+            <div class="stat-icon" style="background:rgba(18,183,166,.12)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12b7a6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             </div>
+            <h2 class="stat-num">36</h2>
+            <p class="stat-label">Districts covered</p>
         </div>
     </div>
 </section>
 
-<section class="max-w-7xl mx-auto px-6 py-14">
-    <div class="grid lg:grid-cols-2 gap-8">
-        <div class="bg-white rounded-xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold mb-6">
-                Search NGOs
-            </h2>
-            <select
-                id="districtSearch"
-                class="w-full border rounded-lg p-3 mb-4">
-                <option value="">
-                    All Districts
-                </option>
-            </select>
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Education, Women, Health..."
-                class="w-full border rounded-lg p-3 mb-4">
-            <button
-                id="searchBtn"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3">
+<!-- ================= SEARCH / RECOMMEND ================= -->
+<section id="search" class="max-w-7xl mx-auto px-6 pb-16">
+    <div class="grid lg:grid-cols-2 gap-7">
+
+        <div id="searchPanel" class="glass panel">
+            <div class="panel-icon indigo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            </div>
+            <h2>Search NGOs</h2>
+            <p class="panel-sub">Browse by district and keyword</p>
+
+            <div class="field-gap">
+                <label class="field-label" for="districtSearch">District</label>
+                <select id="districtSearch">
+                    <option value="">All districts</option>
+                </select>
+            </div>
+            <div class="field-gap">
+                <label class="field-label" for="searchInput">Keyword</label>
+                <input id="searchInput" type="text" placeholder="Education, women, health…">
+            </div>
+            <button id="searchBtn" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
                 Search NGOs
             </button>
         </div>
-        <div class="bg-white rounded-xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold mb-6">
-                AI Recommendation
-            </h2>
-            <select
-                id="districtRecommend"
-                class="w-full border rounded-lg p-3 mb-4">
-                <option value="">
-                    All Districts
-                </option>
-            </select>
-            <textarea
-                id="recommendInput"
-                rows="5"
-                placeholder="Example: I need education support for girls."
-                class="w-full border rounded-lg p-3 mb-4"></textarea>
-            <button
-                id="recommendBtn"
-                class="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-3">
+
+        <div id="recommend" class="glass panel">
+            <div class="panel-icon coral">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3c1.8-1.2 3-3.3 3-5.7a7 7 0 0 0-7-7z"></path><line x1="9" y1="21" x2="15" y2="21"></line></svg>
+            </div>
+            <h2>AI Recommendation</h2>
+            <p class="panel-sub">Describe what you need in your own words</p>
+
+            <div class="field-gap">
+                <label class="field-label" for="districtRecommend">District</label>
+                <select id="districtRecommend">
+                    <option value="">All districts</option>
+                </select>
+            </div>
+            <div class="field-gap">
+                <label class="field-label" for="recommendInput">Your requirement</label>
+                <textarea id="recommendInput" rows="4" placeholder="Example: I need education support for girls."></textarea>
+            </div>
+            <button id="recommendBtn" class="btn btn-accent">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3c1.8-1.2 3-3.3 3-5.7a7 7 0 0 0-7-7z"></path><line x1="9" y1="21" x2="15" y2="21"></line></svg>
                 Find NGOs
             </button>
         </div>
-    </div>
 
+    </div>
 </section>
 
-<section class="max-w-7xl mx-auto px-6 pb-20">
-    <div
-        id="loading"
-        class="hidden text-center py-8">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto"></div>
-        <p class="mt-4">
-            Searching...
-        </p>
-    </div>
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold">
+<!-- ================= RESULTS ================= -->
+<section id="results" class="max-w-7xl mx-auto px-6 pb-24">
+    <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
+        <h2 class="text-2xl md:text-3xl font-bold font-display">
             Results
         </h2>
-        <span
-            id="resultCount"
-            class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
+        <span id="resultCount" class="results-badge">
             0 NGOs
         </span>
     </div>
-    <div
-        id="emptyState"
-        class="hidden bg-white rounded-xl shadow p-10 text-center">
-        <h3 class="text-2xl font-bold">
-            No NGOs Found
+
+    <div id="loading" class="hidden text-center py-16">
+        <div class="spinner"></div>
+        <p class="mt-4 text-slate-500 text-sm">Searching…</p>
+    </div>
+
+    <div id="emptyState" class="hidden glass">
+        <div class="empty-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        </div>
+        <h3 class="text-xl font-bold font-display text-center">
+            No NGOs found
         </h3>
-        <p class="text-slate-500 mt-2">
-            Try another district or another keyword.
+        <p class="text-slate-500 mt-2 text-center">
+            Try another district, or use a broader keyword.
         </p>
     </div>
-    <div
-        id="resultsContainer"
-        class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+    <div id="resultsContainer" class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
     </div>
+
     <!-- Pagination -->
-    <div
-        id="pagination"
-        class="hidden mt-12 flex justify-center items-center gap-2 flex-wrap">
-        <button
-            id="prevPage"
-            class="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">
-            Previous
-        </button>
-        <div
-            id="pageNumbers"
-            class="flex gap-2 flex-wrap">
-        </div>
-        <button
-            id="nextPage"
-            class="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">
-            Next
-        </button>
+    <div id="pagination" class="hidden mt-12 flex justify-center items-center gap-2 flex-wrap">
+        <button id="prevPage" class="page-btn">Previous</button>
+        <div id="pageNumbers" class="flex gap-2 flex-wrap"></div>
+        <button id="nextPage" class="page-btn">Next</button>
     </div>
 
 </section>
 
 <template id="ngoCardTemplate">
-    <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col">
+    <div class="ngo-card glass">
         <div class="flex justify-between items-start gap-3">
-            <h3 class="ngo-name text-xl font-bold"></h3>
-            <span
-                class="score hidden bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm whitespace-nowrap">
-            </span>
+            <div class="flex items-start gap-3">
+                <div class="ngo-avatar"></div>
+                <div>
+                    <h3 class="ngo-name"></h3>
+                    <span class="ngo-district"></span>
+                </div>
+            </div>
+            <span class="score hidden"></span>
         </div>
-        <p class="text-blue-700 text-sm mt-2">
-            District :
-            <span class="ngo-district font-semibold"></span>
-        </p>
-        <p class="ngo-address text-sm text-slate-500 mt-2"></p>
-        <p class="ngo-purpose mt-4"></p>
-        <div class="mt-5 space-y-2 text-sm">
-            <p>
-                <strong>Contact :</strong>
-                <span class="ngo-contact"></span>
-            </p>
-            <p>
-                <strong>Phone :</strong>
-                <span class="ngo-phone"></span>
-            </p>
-            <p>
-                <strong>Email :</strong>
-                <span class="ngo-email"></span>
-            </p>
-            <p>
-                <strong>Website :</strong>
-                <a
-                    class="ngo-website text-blue-600 break-all"
-                    target="_blank">
-
-                </a>
-            </p>
+        <p class="ngo-address"></p>
+        <p class="ngo-purpose"></p>
+        <div class="ngo-meta">
+            <p class="meta-row"><strong>Contact</strong><span class="ngo-contact"></span></p>
+            <p class="meta-row"><strong>Phone</strong><span class="ngo-phone"></span></p>
+            <p class="meta-row"><strong>Email</strong><span class="ngo-email"></span></p>
+            <p class="meta-row"><strong>Website</strong><a class="ngo-website" target="_blank" rel="noopener"></a></p>
         </div>
         <div class="mt-auto pt-6">
-            <a
-                class="ngo-url block bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg py-3"
-                target="_blank">
-
+            <a class="ngo-url" target="_blank" rel="noopener">
                 Visit NGO →
             </a>
         </div>

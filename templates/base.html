@@ -7,36 +7,45 @@
     <title>{% block title %}NGOConnect AI{% endblock %}</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Font -->
+    <!-- Google Fonts: Sora for display, Inter for body/UI -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body class="bg-slate-100 text-slate-800">
+<body>
+    <!-- Ambient cause mesh (fixed, behind all content) -->
+    <div class="mesh-bg" aria-hidden="true">
+        <span class="blob-indigo"></span>
+        <span class="blob-coral"></span>
+        <span class="blob-teal"></span>
+        <span class="blob-amber"></span>
+    </div>
+
     <!-- ================= NAVBAR ================= -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="navbar sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-16">
-                <div>
-                    <h1 class="text-2xl font-bold text-blue-700">
-                        NGOConnect AI
-                    </h1>
-                    <p class="text-xs text-slate-500">
-                        Maharashtra NGO Discovery Platform
-                    </p>
+                <div class="flex items-center gap-3">
+                    <div class="brand-mark">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-900 font-display leading-tight">
+                            NGOConnect AI
+                        </h1>
+                        <p class="text-xs text-slate-500 leading-tight">
+                            Maharashtra NGO Discovery Platform
+                        </p>
+                    </div>
                 </div>
-                <div class="hidden md:flex gap-8">
-                    <a href="#search" class="hover:text-blue-600 transition">
-                        Search
-                    </a>
-                    <a href="#recommend" class="hover:text-blue-600 transition">
-                        AI Match
-                    </a>
-                    <a href="#results" class="hover:text-blue-600 transition">
-                        Results
-                    </a>
+                <div class="hidden md:flex nav-links gap-8">
+                    <a href="#search" class="nav-link">Search</a>
+                    <a href="#recommend" class="nav-link">AI Match</a>
+                    <a href="#results" class="nav-link">Results</a>
                 </div>
             </div>
         </div>
@@ -47,19 +56,19 @@
         {% endblock %}
     </main>
     <!-- ================= FOOTER ================= -->
-    <footer class="bg-slate-900 text-white mt-20">
+    <footer class="site-footer glass-dark text-white mt-24">
         <div class="max-w-7xl mx-auto px-6 py-10">
-            <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <h2 class="font-bold text-lg">
+                    <h2 class="font-bold text-lg font-display">
                         NGOConnect AI
                     </h2>
-                    <p class="text-slate-400 mt-2">
-                        AI-powered NGO Discovery Platform for Maharashtra
+                    <p class="text-slate-400 mt-2 text-sm">
+                        AI-powered NGO discovery platform for Maharashtra
                     </p>
                 </div>
-                <div class="mt-6 md:mt-0 text-sm text-slate-400">
-                    Built with Flask • MySQL • Scikit-learn • Tailwind CSS
+                <div class="text-sm text-slate-400">
+                    Built with Flask · MySQL · Scikit-learn · Tailwind CSS
                 </div>
             </div>
         </div>

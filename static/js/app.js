@@ -41,13 +41,33 @@ async function loadNGOCount(){
         const response=await fetch("/api/ngos");
         const data=await response.json();
 
-        ngoCount.textContent=data.total;
+        animateCount(ngoCount,data.total||0);
 
     }catch(error){
 
         ngoCount.textContent="0";
 
     }
+
+}
+
+function animateCount(el,target){
+
+    const duration=900;
+    const start=performance.now();
+
+    function step(now){
+
+        const progress=Math.min((now-start)/duration,1);
+        const eased=1-Math.pow(1-progress,3);
+
+        el.textContent=Math.round(eased*target);
+
+        if(progress<1) requestAnimationFrame(step);
+
+    }
+
+    requestAnimationFrame(step);
 
 }
 
@@ -82,9 +102,38 @@ async function loadDistricts(){
 
 function showLoading(){
 
-    loading.classList.remove("hidden");
     emptyState.classList.add("hidden");
     resultsContainer.innerHTML="";
+    resultsContainer.appendChild(buildSkeletons());
+
+}
+
+function buildSkeletons(){
+
+    const frag=document.createDocumentFragment();
+
+    for(let i=0;i<6;i++){
+
+        const card=document.createElement("div");
+        card.className="skeleton-card glass";
+
+        const widths=["60%","40%","90%","100%","95%","70%"];
+
+        widths.forEach(w=>{
+
+            const line=document.createElement("div");
+            line.className="skeleton-line";
+            line.style.width=w;
+            line.style.marginTop="14px";
+            card.appendChild(line);
+
+        });
+
+        frag.appendChild(card);
+
+    }
+
+    return frag;
 
 }
 
@@ -113,6 +162,15 @@ function renderCards(ngos,recommend=false){
     ngos.forEach(ngo=>{
 
         const card=cardTemplate.content.cloneNode(true);
+
+        const avatarColors=["#3d5afe","#ff6b4a","#12b7a6","#ffb648","#8a5cf6"];
+        const name=ngo.name||"-";
+        const initial=name.trim().charAt(0).toUpperCase()||"N";
+        const colorIndex=name.length%avatarColors.length;
+
+        const avatar=card.querySelector(".ngo-avatar");
+        avatar.textContent=initial;
+        avatar.style.background=`linear-gradient(135deg, ${avatarColors[colorIndex]}, ${avatarColors[(colorIndex+2)%avatarColors.length]})`;
 
         card.querySelector(".ngo-name").textContent=ngo.name||"-";
         card.querySelector(".ngo-district").textContent=ngo.district||"-";
@@ -178,15 +236,11 @@ function renderPagination(){
 
         btn.textContent=i;
 
-        btn.className="px-4 py-2 rounded-lg border";
+        btn.className="page-btn";
 
         if(i===currentPage){
 
-            btn.classList.add("bg-blue-600","text-white");
-
-        }else{
-
-            btn.classList.add("bg-white");
+            btn.classList.add("active");
 
         }
 
