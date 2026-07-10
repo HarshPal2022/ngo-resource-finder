@@ -16,6 +16,9 @@ def get_connection():
             user=db_config.MYSQL_USER,
             password=db_config.MYSQL_PASSWORD,
             database=db_config.MYSQL_DATABASE,
+
+            ssl_ca=db_config.MYSQL_SSL_CA,
+            ssl_verify_cert=True,
         )
         return connection
 
@@ -76,7 +79,6 @@ def insert_data():
             None if pd.isna(row["mission"]) else str(row["mission"]),
             None if pd.isna(row["url"]) else str(row["url"]),
         )
-
         cursor.execute(insert_query, values)
         inserted += 1
 

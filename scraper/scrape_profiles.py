@@ -67,13 +67,11 @@ def extract_meta_description(soup):
         "Aim/Objective/Mission",
         "Aims/Objectives/Mission"
     ]
-
-    pattern = "(" + "|".join(re.escape(f) for f in fields) + r")\s*:"
+    pattern = "(" + "|".join(re.escape(f) for f in fields) + r")\s*:?"
 
     parts = re.split(pattern, content)
 
     lines = []
-
     i = 1
 
     while i < len(parts):
@@ -182,7 +180,7 @@ def scrape_profile(url):
             if attempt == MAX_RETRIES - 1:
                 raise
 
-            time.sleep(2** attempt)
+            time.sleep(2* attempt)
 
     return None
 
