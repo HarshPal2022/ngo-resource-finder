@@ -32,7 +32,7 @@ def decode_cfemail(encoded):
         email = ""
 
         for i in range(2, len(encoded), 2):
-            email += chr(int(encoded[i:i+2], 16) ^ key)
+            email += chr(int(encoded[i:i + 2], 16) ^ key)
 
         return email
 
@@ -65,13 +65,15 @@ def extract_meta_description(soup):
         "Contact Person",
         "Purpose",
         "Aim/Objective/Mission",
-        "Aims/Objectives/Mission"
+        "Aims/Objectives/Mission",
     ]
+
     pattern = "(" + "|".join(re.escape(f) for f in fields) + r")\s*:?"
 
     parts = re.split(pattern, content)
 
     lines = []
+
     i = 1
 
     while i < len(parts):
@@ -97,25 +99,26 @@ def scrape_profile(url):
 
             response = session.get(
                 url,
-                timeout=15
+                timeout=15,
             )
 
             response.raise_for_status()
+
             soup = BeautifulSoup(
                 response.text,
-                "html.parser"
+                "html.parser",
             )
 
             title = soup.find(
                 "h1",
-                class_="entry-title"
+                class_="entry-title",
             )
 
             name = title.get_text(strip=True) if title else ""
 
             entry = soup.find(
                 "div",
-                class_="entry clearfix"
+                class_="entry clearfix",
             )
 
             lines = []
@@ -126,7 +129,7 @@ def scrape_profile(url):
                     x.strip()
                     for x in entry.get_text(
                         "\n",
-                        strip=True
+                        strip=True,
                     ).split("\n")
                     if x.strip()
                 ]
@@ -135,10 +138,12 @@ def scrape_profile(url):
 
             if meta_lines:
                 lines = meta_lines
+
             data = parse_entry(lines)
-            # -------------------
-            # Decode Cloudflare Email
-            # -------------------
+
+            # ---------------------------------
+            # Decode Cloudflare protected email
+            # ---------------------------------
 
             cf = soup.select_one("a.__cf_email__")
 
@@ -151,26 +156,11 @@ def scrape_profile(url):
                 if email:
                     data["email"] = email
 
-            # -------------------
-            # Website
-            # -------------------
-
-            if not data.get("website"):
-
-                for a in soup.find_all("a", href=True):
-
-                    href = a["href"].strip()
-
-                    if (
-                        href.startswith("http")
-                        and "ngosindia.org" not in href
-                    ):
-
-                        data["website"] = href
-                        break
+            # ---------------------------------
+            # Final NGO data
+            # ---------------------------------
 
             data["name"] = name
-
             data["url"] = url
 
             return data
@@ -180,7 +170,7 @@ def scrape_profile(url):
             if attempt == MAX_RETRIES - 1:
                 raise
 
-            time.sleep(2* attempt)
+            time.sleep(2 * (attempt + 1))
 
     return None
 
@@ -210,7 +200,7 @@ def main():
 
         url = row["profile_url"]
 
-        print(f"[{index+1}/{total}] {district}")
+        print(f"[{index + 1}/{total}] {district}")
 
         try:
 
@@ -255,7 +245,7 @@ def main():
     df.to_csv(
         RAW_DATA_FILE,
         index=False,
-        encoding="utf-8-sig"
+        encoding="utf-8-sig",
     )
 
     print("\n" + "=" * 60)
