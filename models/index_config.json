@@ -1,0 +1,6 @@
+{
+    "model": "openai/text-embedding-ada-002",
+    "count": 1685,
+    "dimensions": 1536,
+    "source": "data\\cleaned_ngos.csv"
+}

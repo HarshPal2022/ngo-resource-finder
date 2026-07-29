@@ -2,6 +2,8 @@
 venv/
 .venv/
 
+experiments/hybrid_recommender/artifacts/
+
 # Python
 __pycache__/
 *.pyc
